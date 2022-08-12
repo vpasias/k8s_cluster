@@ -103,6 +103,12 @@ sleep 60
 
 virsh list --all && brctl show && virsh net-list --all
 
+for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i 'echo "root:gprm8350" | sudo chpasswd'; done
+for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i 'echo "rocky:kyax7344" | sudo chpasswd'; done
+for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i "sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config"; done
+for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i "sudo systemctl restart sshd"; done
+for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i "sudo rm -rf /root/.ssh/authorized_keys"; done
+
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf update -y"; done
 
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /root/.ssh/authorized_keys"; done
