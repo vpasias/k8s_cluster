@@ -209,22 +209,22 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false
-    ens12:
+    enp9s0:
       dhcp4: false
       dhcp6: false
   bonds:
     bond1:
-      interfaces: [ens11, ens12]
+      interfaces: [enp8s0, enp9s0]
       addresses: [192.168.30.101/24]
       parameters:
         mode: active-backup
-        primary: ens11
+        primary: enp8s0
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n2 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -234,22 +234,22 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false
-    ens12:
+    enp9s0:
       dhcp4: false
       dhcp6: false
   bonds:
     bond1:
-      interfaces: [ens11, ens12]
+      interfaces: [enp8s0, enp9s0]
       addresses: [192.168.30.102/24]
       parameters:
         mode: active-backup
-        primary: ens11       
+        primary: enp8s0       
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n3 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -259,22 +259,22 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false
-    ens12:
+    enp9s0:
       dhcp4: false
       dhcp6: false
   bonds:
     bond1:
-      interfaces: [ens11, ens12]
+      interfaces: [enp8s0, enp9s0]
       addresses: [192.168.30.103/24]
       parameters:
         mode: active-backup
-        primary: ens11   
+        primary: enp8s0  
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n4 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -284,22 +284,22 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false
-    ens12:
+    enp9s0:
       dhcp4: false
       dhcp6: false
   bonds:
     bond1:
-      interfaces: [ens11, ens12]
+      interfaces: [enp8s0, enp9s0]
       addresses: [192.168.30.104/24]
       parameters:
         mode: active-backup
-        primary: ens11    
+        primary: enp8s0    
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n5 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -309,22 +309,22 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false
-    ens12:
+    enp9s0:
       dhcp4: false
       dhcp6: false
   bonds:
     bond1:
-      interfaces: [ens11, ens12]
+      interfaces: [enp8s0, enp9s0]
       addresses: [192.168.30.105/24]
       parameters:
         mode: active-backup
-        primary: ens11     
+        primary: enp8s0     
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n6 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -334,22 +334,22 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false
-    ens12:
+    enp9s0:
       dhcp4: false
       dhcp6: false
   bonds:
     bond1:
-      interfaces: [ens11, ens12]
+      interfaces: [enp8s0, enp9s0]
       addresses: [192.168.30.106/24]
       parameters:
         mode: active-backup
-        primary: ens11    
+        primary: enp8s0   
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n7 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -359,22 +359,22 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false
-    ens12:
+    enp9s0:
       dhcp4: false
       dhcp6: false
   bonds:
     bond1:
-      interfaces: [ens11, ens12]
+      interfaces: [enp8s0, enp9s0]
       addresses: [192.168.30.107/24]
       parameters:
         mode: active-backup
-        primary: ens11     
+        primary: enp8s0     
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n8 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -384,22 +384,22 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false
-    ens12:
+    enp9s0:
       dhcp4: false
       dhcp6: false
   bonds:
     bond1:
-      interfaces: [ens11, ens12]
+      interfaces: [enp8s0, enp9s0]
       addresses: [192.168.30.108/24]
       parameters:
         mode: active-backup
-        primary: ens11     
+        primary: enp8s0     
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n9 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -409,22 +409,22 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ens3:
+    enp1s0:
       dhcp4: true
       dhcp6: false
-    ens11:
+    enp8s0:
       dhcp4: false
       dhcp6: false
-    ens12:
+    enp9s0:
       dhcp4: false
       dhcp6: false
   bonds:
     bond1:
-      interfaces: [ens11, ens12]
+      interfaces: [enp8s0, enp9s0]
       addresses: [192.168.30.109/24]
       parameters:
         mode: active-backup
-        primary: ens11       
+        primary: enp8s0       
 EOF"
 
 for i in {1..9}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..9}; do virsh start n$i; done && sleep 10 && virsh list --all
