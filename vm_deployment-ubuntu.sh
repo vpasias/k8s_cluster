@@ -196,4 +196,292 @@ for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo sysctl --
 
 for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "#echo vm.swappiness=1 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"; done
 
+ssh -o "StrictHostKeyChecking=no" ubuntu@n1 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens3:
+      dhcp4: true
+      dhcp6: false
+    ens11:
+      dhcp4: false
+      dhcp6: false
+    ens12:
+      dhcp4: false
+      dhcp6: false
+    ens13:
+      dhcp4: false
+      dhcp6: false
+    ens14:
+      dhcp4: false
+      dhcp6: false
+  bonds:
+    bond1:
+      interfaces: [ens11, ens12]
+      addresses: [192.168.30.101/24]
+      parameters:
+        mode: active-backup
+        primary: ens11
+    bond2:
+      interfaces: [ens13, ens14]
+      parameters:
+        mode: active-backup
+        primary: ens13
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n2 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens3:
+      dhcp4: true
+      dhcp6: false
+    ens11:
+      dhcp4: false
+      dhcp6: false
+    ens12:
+      dhcp4: false
+      dhcp6: false
+    ens13:
+      dhcp4: false
+      dhcp6: false
+    ens14:
+      dhcp4: false
+      dhcp6: false
+  bonds:
+    bond1:
+      interfaces: [ens11, ens12]
+      addresses: [192.168.30.102/24]
+      parameters:
+        mode: active-backup
+        primary: ens11
+    bond2:
+      interfaces: [ens13, ens14]
+      parameters:
+        mode: active-backup
+        primary: ens13
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n3 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens3:
+      dhcp4: true
+      dhcp6: false
+    ens11:
+      dhcp4: false
+      dhcp6: false
+    ens12:
+      dhcp4: false
+      dhcp6: false
+    ens13:
+      dhcp4: false
+      dhcp6: false
+    ens14:
+      dhcp4: false
+      dhcp6: false
+  bonds:
+    bond1:
+      interfaces: [ens11, ens12]
+      addresses: [192.168.30.103/24]
+      parameters:
+        mode: active-backup
+        primary: ens11
+    bond2:
+      interfaces: [ens13, ens14]
+      parameters:
+        mode: active-backup
+        primary: ens13
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n4 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens3:
+      dhcp4: true
+      dhcp6: false
+    ens11:
+      dhcp4: false
+      dhcp6: false
+    ens12:
+      dhcp4: false
+      dhcp6: false
+    ens13:
+      dhcp4: false
+      dhcp6: false
+    ens14:
+      dhcp4: false
+      dhcp6: false
+  bonds:
+    bond1:
+      interfaces: [ens11, ens12]
+      addresses: [192.168.30.104/24]
+      parameters:
+        mode: active-backup
+        primary: ens11
+    bond2:
+      interfaces: [ens13, ens14]
+      parameters:
+        mode: active-backup
+        primary: ens13
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n5 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens3:
+      dhcp4: true
+      dhcp6: false
+    ens11:
+      dhcp4: false
+      dhcp6: false
+    ens12:
+      dhcp4: false
+      dhcp6: false
+    ens13:
+      dhcp4: false
+      dhcp6: false
+    ens14:
+      dhcp4: false
+      dhcp6: false
+  bonds:
+    bond1:
+      interfaces: [ens11, ens12]
+      addresses: [192.168.30.105/24]
+      parameters:
+        mode: active-backup
+        primary: ens11
+    bond2:
+      interfaces: [ens13, ens14]
+      parameters:
+        mode: active-backup
+        primary: ens13
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n6 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens3:
+      dhcp4: true
+      dhcp6: false
+    ens11:
+      dhcp4: false
+      dhcp6: false
+    ens12:
+      dhcp4: false
+      dhcp6: false
+    ens13:
+      dhcp4: false
+      dhcp6: false
+    ens14:
+      dhcp4: false
+      dhcp6: false
+  bonds:
+    bond1:
+      interfaces: [ens11, ens12]
+      addresses: [192.168.30.106/24]
+      parameters:
+        mode: active-backup
+        primary: ens11
+    bond2:
+      interfaces: [ens13, ens14]
+      parameters:
+        mode: active-backup
+        primary: ens13
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n7 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens3:
+      dhcp4: true
+      dhcp6: false
+    ens11:
+      dhcp4: false
+      dhcp6: false
+    ens12:
+      dhcp4: false
+      dhcp6: false
+    ens13:
+      dhcp4: false
+      dhcp6: false
+    ens14:
+      dhcp4: false
+      dhcp6: false
+  bonds:
+    bond1:
+      interfaces: [ens11, ens12]
+      addresses: [192.168.30.107/24]
+      parameters:
+        mode: active-backup
+        primary: ens11
+    bond2:
+      interfaces: [ens13, ens14]
+      parameters:
+        mode: active-backup
+        primary: ens13
+EOF"
+
+ssh -o "StrictHostKeyChecking=no" ubuntu@n8 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens3:
+      dhcp4: true
+      dhcp6: false
+    ens11:
+      dhcp4: false
+      dhcp6: false
+    ens12:
+      dhcp4: false
+      dhcp6: false
+    ens13:
+      dhcp4: false
+      dhcp6: false
+    ens14:
+      dhcp4: false
+      dhcp6: false
+  bonds:
+    bond1:
+      interfaces: [ens11, ens12]
+      addresses: [192.168.30.108/24]
+      parameters:
+        mode: active-backup
+        primary: ens11
+    bond2:
+      interfaces: [ens13, ens14]
+      parameters:
+        mode: active-backup
+        primary: ens13
+EOF"
+
 for i in {1..8}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..8}; do virsh start n$i; done && sleep 10 && virsh list --all
