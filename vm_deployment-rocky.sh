@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+HOME=/mnt/extra/
 
 cat > /mnt/extra/mgmt.xml <<EOF
 <network>
