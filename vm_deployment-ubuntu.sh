@@ -233,6 +233,8 @@ network:
       parameters:
         mode: active-backup
         primary: ens13
+        transmit-hash-policy: layer3+4
+        mii-monitor-interval: 1
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n2 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -269,6 +271,8 @@ network:
       parameters:
         mode: active-backup
         primary: ens13
+        transmit-hash-policy: layer3+4
+        mii-monitor-interval: 1        
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n3 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -305,6 +309,8 @@ network:
       parameters:
         mode: active-backup
         primary: ens13
+        transmit-hash-policy: layer3+4
+        mii-monitor-interval: 1        
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n4 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -341,6 +347,8 @@ network:
       parameters:
         mode: active-backup
         primary: ens13
+        transmit-hash-policy: layer3+4
+        mii-monitor-interval: 1        
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n5 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -377,6 +385,8 @@ network:
       parameters:
         mode: active-backup
         primary: ens13
+        transmit-hash-policy: layer3+4
+        mii-monitor-interval: 1        
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n6 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -413,6 +423,8 @@ network:
       parameters:
         mode: active-backup
         primary: ens13
+        transmit-hash-policy: layer3+4
+        mii-monitor-interval: 1        
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n7 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -449,6 +461,8 @@ network:
       parameters:
         mode: active-backup
         primary: ens13
+        transmit-hash-policy: layer3+4
+        mii-monitor-interval: 1        
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n8 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -485,6 +499,8 @@ network:
       parameters:
         mode: active-backup
         primary: ens13
+        transmit-hash-policy: layer3+4
+        mii-monitor-interval: 1        
 EOF"
 
 for i in {1..8}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..8}; do virsh start n$i; done && sleep 10 && virsh list --all
