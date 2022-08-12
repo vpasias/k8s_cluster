@@ -144,16 +144,16 @@ sleep 30
 
 for i in {1..8}; do qemu-img create -f qcow2 vbdnode1$i.qcow2 120G; done
 for i in {1..8}; do qemu-img create -f qcow2 vbdnode2$i.qcow2 120G; done
-for i in {1..8}; do qemu-img create -f qcow2 vbdnode3$i.qcow2 120G; done
+#for i in {1..8}; do qemu-img create -f qcow2 vbdnode3$i.qcow2 120G; done
 
 for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t vdb n$i; done
 for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t vdc n$i; done
-for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t vdd n$i; done
+#for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t vdd n$i; done
 
 for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
 for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
-for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
-for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
+#for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
+#for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
 
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
@@ -302,17 +302,17 @@ MASTER=bond1
 SLAVE=yes
 EOF"; done
 
-for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth3
-NAME=bond-slave-eth3
-MASTER=bond2
-SLAVE=yes
-EOF"; done
+#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth3
+#NAME=bond-slave-eth3
+#MASTER=bond2
+#SLAVE=yes
+#EOF"; done
 
-for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth4
-NAME=bond-slave-eth4
-MASTER=bond2
-SLAVE=yes
-EOF"; done
+#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth4
+#NAME=bond-slave-eth4
+#MASTER=bond2
+#SLAVE=yes
+#EOF"; done
 
 ### bond1
 sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n1 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
@@ -412,15 +412,15 @@ BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always
 EOF'
 
 ### bond2
-for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond2
-DEVICE=bond2
-NAME=bond2
-ONBOOT=yes
-BOOTPROTO=none
-TYPE=Bond
-BONDING_MASTER=yes
-BONDING_OPTS="mode=active-backup primary=eth3 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
-EOF'; done
+#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond2
+#DEVICE=bond2
+#NAME=bond2
+#ONBOOT=yes
+#BOOTPROTO=none
+#TYPE=Bond
+#BONDING_MASTER=yes
+#BONDING_OPTS="mode=active-backup primary=eth3 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+#EOF'; done
 
 for i in {1..8}; do virsh shutdown n$i; done && sleep 90 && virsh list --all && for i in {1..8}; do virsh start n$i; done && sleep 90 && virsh list --all
 
