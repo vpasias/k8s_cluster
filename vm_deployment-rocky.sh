@@ -40,13 +40,9 @@ EOF
 
 cat > /mnt/extra/ds2.xml <<EOF
 <network>
-  <name>ds2</name>
-  <forward mode='nat'/>    
+  <name>ds2</name>  
   <bridge name='ds2' stp='off' macTableManager="kernel"/>
-  <mtu size="9216"/>
-  <mac address='52:54:00:8a:8b:cc'/>
-  <ip address='192.168.31.1' netmask='255.255.255.0'>
-  </ip>    
+  <mtu size="9216"/> 
 </network>
 EOF
 
