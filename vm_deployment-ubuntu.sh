@@ -152,17 +152,17 @@ sleep 30
 for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt update -y"; done
 
 for i in {1..9}; do qemu-img create -f qcow2 vbdnode1$i 120G; done
-for i in {1..9}; do qemu-img create -f qcow2 vbdnode2$i 120G; done
+#for i in {1..9}; do qemu-img create -f qcow2 vbdnode2$i 120G; done
 #for i in {1..9}; do qemu-img create -f qcow2 vbdnode3$i 120G; done
 
 for i in {1..9}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t vdb n$i; done
-for i in {1..9}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t vdc n$i; done
+#for i in {1..9}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t vdc n$i; done
 #for i in {1..9}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t vdd n$i; done
 
 for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --mac 02:00:aa:0a:01:1$i --config --live; done
 for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ds2 --model virtio --mac 02:00:aa:0a:02:1$i --config --live; done
-for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --mac 02:00:aa:0a:03:1$i --config --live; done
-for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ss2 --model virtio --mac 02:00:aa:0a:04:1$i --config --live; done
+#for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --mac 02:00:aa:0a:03:1$i --config --live; done
+#for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ss2 --model virtio --mac 02:00:aa:0a:04:1$i --config --live; done
 
 for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/hosts
 127.0.0.1 localhost
@@ -218,12 +218,6 @@ network:
     ens12:
       dhcp4: false
       dhcp6: false
-    ens13:
-      dhcp4: false
-      dhcp6: false
-    ens14:
-      dhcp4: false
-      dhcp6: false
   bonds:
     bond1:
       interfaces: [ens11, ens12]
@@ -231,13 +225,6 @@ network:
       parameters:
         mode: active-backup
         primary: ens11
-    bond2:
-      interfaces: [ens13, ens14]
-      parameters:
-        mode: active-backup
-        primary: ens13
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 1
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n2 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -256,26 +243,13 @@ network:
     ens12:
       dhcp4: false
       dhcp6: false
-    ens13:
-      dhcp4: false
-      dhcp6: false
-    ens14:
-      dhcp4: false
-      dhcp6: false
   bonds:
     bond1:
       interfaces: [ens11, ens12]
       addresses: [192.168.30.102/24]
       parameters:
         mode: active-backup
-        primary: ens11
-    bond2:
-      interfaces: [ens13, ens14]
-      parameters:
-        mode: active-backup
-        primary: ens13
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 1        
+        primary: ens11       
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n3 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -294,26 +268,13 @@ network:
     ens12:
       dhcp4: false
       dhcp6: false
-    ens13:
-      dhcp4: false
-      dhcp6: false
-    ens14:
-      dhcp4: false
-      dhcp6: false
   bonds:
     bond1:
       interfaces: [ens11, ens12]
       addresses: [192.168.30.103/24]
       parameters:
         mode: active-backup
-        primary: ens11
-    bond2:
-      interfaces: [ens13, ens14]
-      parameters:
-        mode: active-backup
-        primary: ens13
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 1        
+        primary: ens11   
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n4 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -332,26 +293,13 @@ network:
     ens12:
       dhcp4: false
       dhcp6: false
-    ens13:
-      dhcp4: false
-      dhcp6: false
-    ens14:
-      dhcp4: false
-      dhcp6: false
   bonds:
     bond1:
       interfaces: [ens11, ens12]
       addresses: [192.168.30.104/24]
       parameters:
         mode: active-backup
-        primary: ens11
-    bond2:
-      interfaces: [ens13, ens14]
-      parameters:
-        mode: active-backup
-        primary: ens13
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 1        
+        primary: ens11    
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n5 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -370,26 +318,13 @@ network:
     ens12:
       dhcp4: false
       dhcp6: false
-    ens13:
-      dhcp4: false
-      dhcp6: false
-    ens14:
-      dhcp4: false
-      dhcp6: false
   bonds:
     bond1:
       interfaces: [ens11, ens12]
       addresses: [192.168.30.105/24]
       parameters:
         mode: active-backup
-        primary: ens11
-    bond2:
-      interfaces: [ens13, ens14]
-      parameters:
-        mode: active-backup
-        primary: ens13
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 1        
+        primary: ens11     
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n6 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -408,26 +343,13 @@ network:
     ens12:
       dhcp4: false
       dhcp6: false
-    ens13:
-      dhcp4: false
-      dhcp6: false
-    ens14:
-      dhcp4: false
-      dhcp6: false
   bonds:
     bond1:
       interfaces: [ens11, ens12]
       addresses: [192.168.30.106/24]
       parameters:
         mode: active-backup
-        primary: ens11
-    bond2:
-      interfaces: [ens13, ens14]
-      parameters:
-        mode: active-backup
-        primary: ens13
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 1        
+        primary: ens11    
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n7 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -446,26 +368,13 @@ network:
     ens12:
       dhcp4: false
       dhcp6: false
-    ens13:
-      dhcp4: false
-      dhcp6: false
-    ens14:
-      dhcp4: false
-      dhcp6: false
   bonds:
     bond1:
       interfaces: [ens11, ens12]
       addresses: [192.168.30.107/24]
       parameters:
         mode: active-backup
-        primary: ens11
-    bond2:
-      interfaces: [ens13, ens14]
-      parameters:
-        mode: active-backup
-        primary: ens13
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 1        
+        primary: ens11     
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n8 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -484,26 +393,13 @@ network:
     ens12:
       dhcp4: false
       dhcp6: false
-    ens13:
-      dhcp4: false
-      dhcp6: false
-    ens14:
-      dhcp4: false
-      dhcp6: false
   bonds:
     bond1:
       interfaces: [ens11, ens12]
       addresses: [192.168.30.108/24]
       parameters:
         mode: active-backup
-        primary: ens11
-    bond2:
-      interfaces: [ens13, ens14]
-      parameters:
-        mode: active-backup
-        primary: ens13
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 1        
+        primary: ens11     
 EOF"
 
 ssh -o "StrictHostKeyChecking=no" ubuntu@n9 "cat << EOF | sudo tee /etc/netplan/01-netcfg.yaml
@@ -522,26 +418,13 @@ network:
     ens12:
       dhcp4: false
       dhcp6: false
-    ens13:
-      dhcp4: false
-      dhcp6: false
-    ens14:
-      dhcp4: false
-      dhcp6: false
   bonds:
     bond1:
       interfaces: [ens11, ens12]
       addresses: [192.168.30.109/24]
       parameters:
         mode: active-backup
-        primary: ens11
-    bond2:
-      interfaces: [ens13, ens14]
-      parameters:
-        mode: active-backup
-        primary: ens13
-        transmit-hash-policy: layer3+4
-        mii-monitor-interval: 1        
+        primary: ens11       
 EOF"
 
 for i in {1..9}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..9}; do virsh start n$i; done && sleep 10 && virsh list --all
