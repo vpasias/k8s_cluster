@@ -100,6 +100,19 @@ sleep 60
 
 virsh list --all && brctl show && virsh net-list --all
 
+for i in {1..8}; do qemu-img create -f qcow2 vbdnode1$i.qcow2 120G; done
+for i in {1..8}; do qemu-img create -f qcow2 vbdnode2$i.qcow2 120G; done
+#for i in {1..8}; do qemu-img create -f qcow2 vbdnode3$i.qcow2 120G; done
+
+for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t sdb n$i; done
+for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t sdc n$i; done
+#for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
+
+for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
+for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
+#for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
+#for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
+
 for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i 'echo "root:gprm8350" | sudo chpasswd'; done
 for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i 'echo "rocky:kyax7344" | sudo chpasswd'; done
 for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i "sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config"; done
@@ -137,19 +150,6 @@ for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHost
 for i in {1..8}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..8}; do virsh start n$i; done && sleep 10 && virsh list --all
 
 sleep 30
-
-for i in {1..8}; do qemu-img create -f qcow2 vbdnode1$i.qcow2 120G; done
-for i in {1..8}; do qemu-img create -f qcow2 vbdnode2$i.qcow2 120G; done
-#for i in {1..8}; do qemu-img create -f qcow2 vbdnode3$i.qcow2 120G; done
-
-for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t sdb n$i; done
-for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t sdc n$i; done
-#for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
-
-for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
-for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
-#for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
-#for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
 
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
