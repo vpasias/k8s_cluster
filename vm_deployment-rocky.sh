@@ -112,8 +112,6 @@ for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i "sudo rm -rf /ro
 
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf update -y"; done
 
-for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo hostnamectl set-hostname n$i --static"; done
-
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo mkdir -p /etc/motd.d"; done
 
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/motd.d/01-custom
@@ -278,7 +276,7 @@ USERCTL=no
 EOF"
 
 for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i "uname -a"; done
-for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "hostnamectl set-hostname node-$i --static"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "hostnamectl set-hostname n$i --static"; done
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "modprobe 8021q"; done
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "modprobe bonding"; done
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "lsmod | grep 8021q"; done
