@@ -100,17 +100,17 @@ sleep 30
 
 virsh list --all && brctl show && virsh net-list --all
 
-for i in {1..8}; do virsh destroy n$i; done
+#for i in {1..8}; do virsh destroy n$i; done
 
 for i in {1..8}; do qemu-img create -f qcow2 vbdnode1$i.qcow2 120G; done
 for i in {1..8}; do qemu-img create -f qcow2 vbdnode2$i.qcow2 120G; done
 for i in {1..8}; do qemu-img create -f qcow2 vbdnode3$i.qcow2 120G; done
 
-for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t sdb n$i; done
-for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t sdc n$i; done
-for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
+for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t vdb n$i; done
+for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t vdc n$i; done
+for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t vdd n$i; done
 
-for i in {1..8}; do virsh start n$i; done
+#for i in {1..8}; do virsh start n$i; done
 
 sleep 30
 
