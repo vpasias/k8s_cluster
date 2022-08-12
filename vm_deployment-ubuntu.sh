@@ -545,3 +545,105 @@ network:
 EOF"
 
 for i in {1..9}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..9}; do virsh start n$i; done && sleep 10 && virsh list --all
+
+sleep 30
+
+### Load Balancers configuration
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo apt install -y keepalived haproxy"; done
+
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee  /etc/keepalived/check_apiserver.sh
+#!/bin/sh
+errorExit() {
+  echo "*** $@" 1>&2
+  exit 1
+}
+curl --silent --max-time 2 --insecure https://localhost:6443/ -o /dev/null || errorExit "Error GET https://localhost:6443/"
+if ip addr | grep -q 192.168.30.100; then
+  curl --silent --max-time 2 --insecure https://192.168.30.100:6443/ -o /dev/null || errorExit "Error GET https://192.168.30.100:6443/"
+fi
+EOF'; done
+
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo chmod +x /etc/keepalived/check_apiserver.sh"; done
+
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/keepalived/keepalived.conf
+vrrp_script check_apiserver {
+  script "/etc/keepalived/check_apiserver.sh"
+  interval 3
+  timeout 10
+  fall 5
+  rise 2
+  weight -2
+}
+vrrp_instance VI_1 {
+    state BACKUP
+    interface eth1
+    virtual_router_id 1
+    priority 100
+    advert_int 5
+    authentication {
+        auth_type PASS
+        auth_pass mysecret
+    }
+    virtual_ipaddress {
+        192.168.30.100
+    }
+    track_script {
+        check_apiserver
+    }
+}
+EOF'; done
+
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl enable --now keepalived"; done
+
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee/etc/haproxy/haproxy.cfg
+frontend kubernetes-frontend
+  bind *:6443
+  mode tcp
+  option tcplog
+  default_backend kubernetes-backend
+backend kubernetes-backend
+  option httpchk GET /healthz
+  http-check expect status 200
+  mode tcp
+  option ssl-hello-chk
+  balance roundrobin
+    server n1 192.168.30.101:6443 check fall 3 rise 2
+    server n2 192.168.30.102:6443 check fall 3 rise 2
+    server n3 192.168.30.103:6443 check fall 3 rise 2
+EOF'; done
+
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl enable haproxy && sudo systemctl restart haproxy"; done
+
+### Kubernetes nodes configuration
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "swapoff -a && sed -i '/swap/d' /etc/fstab"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo modprobe overlay"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo modprobe br_netfilter"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo sysctl --system"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'export OS=xUbuntu_20.04 && export VERSION=1.24.2 && echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list'; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'export OS=xUbuntu_20.04 && export VERSION=1.24.2 && curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | sudo apt-key add -'; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'export OS=xUbuntu_20.04 && export VERSION=1.24.2 && echo "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.list'; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'export OS=xUbuntu_20.04 && export VERSION=1.24.2 && curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$VERSION/$OS/Release.key | sudo apt-key add -'; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo apt update && sudo apt install -y cri-o cri-o-runc cri-tools"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl enable crio.service"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl start crio.service"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"'; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo apt update && sudo apt install -y kubelet kubeadm kubectl"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl enable kubelet"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl start kubelet"; done
