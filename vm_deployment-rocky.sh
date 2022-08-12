@@ -8,7 +8,19 @@ cat > /mnt/extra/mgmt.xml <<EOF
   <bridge name='mgmt' stp='off' macTableManager="kernel"/>
   <mtu size="9216"/>
   <mac address='52:54:00:8a:8b:ca'/>
-  <ip address='192.168.20.1' netmask='255.255.255.0'>
+  <ip address='192.168.254.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.254.2' end='192.168.254.249'/>
+      <host mac='52:54:00:8a:8b:c1' name='n1' ip='192.168.254.101'/>
+      <host mac='52:54:00:8a:8b:c2' name='n2' ip='192.168.254.102'/>
+      <host mac='52:54:00:8a:8b:c3' name='n3' ip='192.168.254.103'/>
+      <host mac='52:54:00:8a:8b:c4' name='n4' ip='192.168.254.104'/>
+      <host mac='52:54:00:8a:8b:c5' name='n5' ip='192.168.254.105'/>
+      <host mac='52:54:00:8a:8b:c6' name='n6' ip='192.168.254.106'/>
+      <host mac='52:54:00:8a:8b:c7' name='n7' ip='192.168.254.107'/>
+      <host mac='52:54:00:8a:8b:c8' name='n8' ip='192.168.254.108'/>
+      <host mac='52:54:00:8a:8b:c9' name='n9' ip='192.168.254.109'/>
+    </dhcp>
   </ip>
 </network>
 EOF
@@ -64,82 +76,85 @@ ip a && sudo virsh net-list --all
 sleep 20
 
 # Node 1
-./kvm-install-vm create -c 6 -m 32768 -t centos8 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c1 n1
+./kvm-install-vm create -c 4 -m 16384 -t rocky8.5 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c1 n1
 
 # Node 2
-./kvm-install-vm create -c 6 -m 32768 -t centos8 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c2 n2
+./kvm-install-vm create -c 4 -m 16384 -t rocky8.5 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c2 n2
 
 # Node 3
-./kvm-install-vm create -c 6 -m 32768 -t centos8 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c3 n3
+./kvm-install-vm create -c 4 -m 16384 -t rocky8.5 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c3 n3
 
 # Node 4
-./kvm-install-vm create -c 6 -m 32768 -t centos8 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c4 n4
+./kvm-install-vm create -c 4 -m 16384 -t rocky8.5 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c4 n4
 
 # Node 5
-./kvm-install-vm create -c 6 -m 32768 -t centos8 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c5 n5
+./kvm-install-vm create -c 4 -m 16384 -t rocky8.5 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c5 n5
 
 # Node 6
-./kvm-install-vm create -c 6 -m 32768 -t centos8 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b virbr100 -T US/Eastern -M 52:54:00:8a:8b:c6 n6
+./kvm-install-vm create -c 4 -m 16384 -t rocky8.5 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c6 n6
+
+# Node 7
+./kvm-install-vm create -c 4 -m 16384 -t rocky8.5 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c7 n7
+
+# Node 8
+./kvm-install-vm create -c 4 -m 16384 -t rocky8.5 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c8 n8
 
 sleep 60
 
 virsh list --all && brctl show && virsh net-list --all
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf update -y"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf update -y"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /root/.ssh/authorized_keys"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /root/.ssh/authorized_keys"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo hostnamectl set-hostname n$i --static"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo hostnamectl set-hostname n$i --static"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo mkdir -p /etc/motd.d"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo mkdir -p /etc/motd.d"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/motd.d/01-custom
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/motd.d/01-custom
 ****************************WARNING****************************************
 UNAUTHORISED ACCESS IS PROHIBITED. VIOLATORS WILL BE PROSECUTED.
 ***************************************************************************
 EOF'; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo chmod +x /etc/motd.d/01-custom"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo chmod +x /etc/motd.d/01-custom"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/modprobe.d/kvm.conf
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/modprobe.d/kvm.conf
 options kvm_intel nested=1
 EOF"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo modprobe -r kvm_intel && sudo modprobe -a kvm_intel"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo modprobe -r kvm_intel && sudo modprobe -a kvm_intel"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo mkdir -p /etc/systemd/system/networking.service.d"; done
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/systemd/system/networking.service.d/reduce-timeout.conf
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo mkdir -p /etc/systemd/system/networking.service.d"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/systemd/system/networking.service.d/reduce-timeout.conf
 [Service]
 TimeoutStartSec=15
 EOF"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf makecache && sudo dnf install epel-release -y && sudo dnf makecache"; done
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install -y git vim net-tools wget curl bash-completion iperf3 mtr traceroute netcat sshpass socat python3 python3-simplejson xfsprogs jq virtualenv"; done
-#for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install systemd-timesyncd -y && sudo systemctl unmask systemd-timesyncd.service && sudo systemctl enable systemd-timesyncd.service && sudo systemctl restart systemd-timesyncd.service && sudo timedatectl set-ntp on"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf makecache && sudo dnf install epel-release -y && sudo dnf makecache"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install -y git vim net-tools wget curl bash-completion iperf3 mtr traceroute netcat sshpass socat python3 python3-simplejson xfsprogs jq virtualenv"; done
+#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install systemd-timesyncd -y && sudo systemctl unmask systemd-timesyncd.service && sudo systemctl enable systemd-timesyncd.service && sudo systemctl restart systemd-timesyncd.service && sudo timedatectl set-ntp on"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo modprobe -v xfs && sudo grep xfs /proc/filesystems && sudo modinfo xfs"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo modprobe -v xfs && sudo grep xfs /proc/filesystems && sudo modinfo xfs"; done
 
-for i in {1..6}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..6}; do virsh start n$i; done && sleep 10 && virsh list --all
+for i in {1..8}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..8}; do virsh start n$i; done && sleep 10 && virsh list --all
 
 sleep 30
 
-for i in {1..6}; do qemu-img create -f qcow2 vbdnode1$i.qcow2 120G; done
-for i in {1..6}; do qemu-img create -f qcow2 vbdnode2$i.qcow2 120G; done
-for i in {1..6}; do qemu-img create -f qcow2 vbdnode3$i.qcow2 120G; done
+for i in {1..8}; do qemu-img create -f qcow2 vbdnode1$i.qcow2 120G; done
+for i in {1..8}; do qemu-img create -f qcow2 vbdnode2$i.qcow2 120G; done
+for i in {1..8}; do qemu-img create -f qcow2 vbdnode3$i.qcow2 120G; done
 
-for i in {1..6}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t sdb n$i; done
-for i in {1..6}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t sdc n$i; done
-for i in {1..6}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
+for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t sdb n$i; done
+for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t sdc n$i; done
+for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
 
-#for i in {1..6}; do virsh attach-interface --domain n$i --type network --source overlay --model e1000 --mac 02:00:aa:0a:01:1$i --config --live; done
-#for i in {1..6}; do virsh attach-interface --domain n$i --type network --source storage --model e1000 --mac 02:00:aa:0a:02:1$i --config --live; done
-#for i in {1..6}; do virsh attach-interface --domain n$i --type network --source provider --model e1000 --mac 02:00:aa:0a:03:1$i --config --live; done
+for i in {1..6}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --mac 02:00:aa:0a:01:1$i --config --live; done
+for i in {1..6}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --mac 02:00:aa:0a:02:1$i --config --live; done
+for i in {1..6}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --mac 02:00:aa:0a:03:1$i --config --live; done
+for i in {1..6}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --mac 02:00:aa:0a:04:1$i --config --live; done
 
-for i in {1..6}; do virsh attach-interface --domain n$i --type network --source overlay --model virtio --mac 02:00:aa:0a:01:1$i --config --live; done
-for i in {1..6}; do virsh attach-interface --domain n$i --type network --source storage --model virtio --mac 02:00:aa:0a:02:1$i --config --live; done
-for i in {1..6}; do virsh attach-interface --domain n$i --type network --source provider --model virtio --mac 02:00:aa:0a:03:1$i --config --live; done
-
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/hosts
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 192.168.254.101  n1
@@ -153,7 +168,7 @@ for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHost
 192.168.254.109  n9
 EOF"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/sysctl.d/60-lxd-production.conf
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/sysctl.d/60-lxd-production.conf
 fs.inotify.max_queued_events=1048576
 fs.inotify.max_user_instances=1048576
 fs.inotify.max_user_watches=1048576
@@ -169,14 +184,14 @@ net.ipv4.conf.all.forwarding=1
 net.ipv6.conf.all.forwarding=1
 EOF"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo sysctl --system"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo sysctl --system"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "#echo vm.swappiness=1 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "#echo vm.swappiness=1 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p"; done
 
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth0"; done
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth1"; done
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth2"; done
-for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth3"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth0"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth1"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth2"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth3"; done
 
 ### eth0
 sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n1 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -239,7 +254,27 @@ TYPE=Ethernet
 USERCTL=no
 EOF"
 
-### eth1
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n7 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0
+BOOTPROTO=dhcp
+HWADDR=52:54:00:8a:8b:c7
+MTU=9000
+ONBOOT=yes
+TYPE=Ethernet
+USERCTL=no
+EOF"
+
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n8 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0
+BOOTPROTO=dhcp
+HWADDR=52:54:00:8a:8b:c8
+MTU=9000
+ONBOOT=yes
+TYPE=Ethernet
+USERCTL=no
+EOF"
+
+### 
 sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n1 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth1
 DEVICE=eth1
 BOOTPROTO=static
@@ -446,4 +481,4 @@ TYPE=Ethernet
 USERCTL=no
 EOF"
 
-for i in {1..6}; do virsh shutdown n$i; done && sleep 90 && virsh list --all && for i in {1..6}; do virsh start n$i; done && sleep 90 && virsh list --all
+for i in {1..8}; do virsh shutdown n$i; done && sleep 90 && virsh list --all && for i in {1..8}; do virsh start n$i; done && sleep 90 && virsh list --all
