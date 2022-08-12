@@ -53,10 +53,10 @@ cat > /mnt/extra/ss2.xml <<EOF
 </network>
 EOF
 
-virsh net-define /home/iason/vms/mgmt.xml && virsh net-autostart mgmt && virsh net-start mgmt
-virsh net-define /home/iason/vms/ds1.xml && virsh net-autostart ds1 && virsh net-start ds1
-virsh net-define /home/iason/vms/ds2.xml && virsh net-autostart ds2 && virsh net-start ds2
-virsh net-define /home/iason/vms/ss1.xml && virsh net-autostart ss1 && virsh net-start ss1
-virsh net-define /home/iason/vms/ss2.xml && virsh net-autostart ss2 && virsh net-start ss2
+virsh net-define /mnt/extra/mgmt.xml && virsh net-autostart mgmt && virsh net-start mgmt
+virsh net-define /mnt/extra/ds1.xml && virsh net-autostart ds1 && virsh net-start ds1
+virsh net-define /mnt/extra/ds2.xml && virsh net-autostart ds2 && virsh net-start ds2
+virsh net-define /mnt/extra/ss1.xml && virsh net-autostart ss1 && virsh net-start ss1
+virsh net-define /mnt/extra/ss2.xml && virsh net-autostart ss2 && virsh net-start ss2
 
 ip a && sudo virsh net-list --all
