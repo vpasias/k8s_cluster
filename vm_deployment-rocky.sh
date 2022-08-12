@@ -133,8 +133,6 @@ EOF"; done
 
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf makecache && sudo dnf install epel-release -y && sudo dnf makecache"; done
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install -y git vim net-tools wget curl bash-completion iperf3 mtr traceroute netcat sshpass socat python3 python3-simplejson xfsprogs jq virtualenv"; done
-#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install systemd-timesyncd -y && sudo systemctl unmask systemd-timesyncd.service && sudo systemctl enable systemd-timesyncd.service && sudo systemctl restart systemd-timesyncd.service && sudo timedatectl set-ntp on"; done
-
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo modprobe -v xfs && sudo grep xfs /proc/filesystems && sudo modinfo xfs"; done
 
 for i in {1..8}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..8}; do virsh start n$i; done && sleep 10 && virsh list --all
@@ -149,23 +147,23 @@ for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-instal
 for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t sdc n$i; done
 for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
 
-for i in {1..6}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --mac 02:00:aa:0a:01:1$i --config --live; done
-for i in {1..6}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --mac 02:00:aa:0a:02:1$i --config --live; done
-for i in {1..6}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --mac 02:00:aa:0a:03:1$i --config --live; done
-for i in {1..6}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --mac 02:00:aa:0a:04:1$i --config --live; done
+for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
+for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
+for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
+for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
 
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/hosts
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-192.168.254.101  n1
-192.168.254.102  n2
-192.168.254.103  n3
-192.168.254.104  n4
-192.168.254.105  n5
-192.168.254.106  n6
-192.168.254.107  n7
-192.168.254.108  n8
-192.168.254.109  n9
+192.168.30.101  n1
+192.168.30.102  n2
+192.168.30.103  n3
+192.168.30.104  n4
+192.168.30.105  n5
+192.168.30.106  n6
+192.168.30.107  n7
+192.168.30.108  n8
+192.168.30.109  n9
 EOF"; done
 
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/sysctl.d/60-lxd-production.conf
@@ -274,211 +272,212 @@ TYPE=Ethernet
 USERCTL=no
 EOF"
 
-### 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n1 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth1
-DEVICE=eth1
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:01:11
-IPADDR=192.168.255.11
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i "uname -a"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "hostnamectl set-hostname node-$i --static"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "modprobe 8021q"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "modprobe bonding"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "lsmod | grep 8021q"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "lsmod | grep bonding"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "echo 8021q >> /etc/modules-load.d/8021q.conf"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "echo bonding >> /etc/modules"; done
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n2 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth1
-DEVICE=eth1
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:01:12
-IPADDR=192.168.255.12
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth1 /tmp/ifcfg-eth1"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth2 /tmp/ifcfg-eth2"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth3 /tmp/ifcfg-eth3"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth4 /tmp/ifcfg-eth4"; done
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n3 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth1
-DEVICE=eth1
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:01:13
-IPADDR=192.168.255.13
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+### Bond port configuration
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth1
+NAME=bond-slave-eth1
+MASTER=bond1
+SLAVE=yes
+EOF"; done
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n4 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth1
-DEVICE=eth1
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:01:14
-IPADDR=192.168.255.14
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth2
+NAME=bond-slave-eth2
+MASTER=bond1
+SLAVE=yes
+EOF"; done
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n5 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth1
-DEVICE=eth1
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:01:15
-IPADDR=192.168.255.15
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth3
+NAME=bond-slave-eth3
+MASTER=bond2
+SLAVE=yes
+EOF"; done
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n6 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth1
-DEVICE=eth1
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:01:16
-IPADDR=192.168.255.16
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth4
+NAME=bond-slave-eth4
+MASTER=bond2
+SLAVE=yes
+EOF"; done
 
-### eth2
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n1 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth2
-DEVICE=eth2
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:02:11
-IPADDR=192.168.250.11
+### bond1
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n1 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
+DEVICE=bond1
+NAME=bond1
+IPADDR=192.168.30.101
 NETMASK=255.255.255.0
-MTU=9000
 ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
-
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n2 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth2
-DEVICE=eth2
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:02:12
-IPADDR=192.168.250.12
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
-
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n3 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth2
-DEVICE=eth2
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:02:13
-IPADDR=192.168.250.13
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
-
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n4 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth2
-DEVICE=eth2
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:02:14
-IPADDR=192.168.250.14
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
-
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n5 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth2
-DEVICE=eth2
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:02:15
-IPADDR=192.168.250.15
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
-
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n6 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth2
-DEVICE=eth2
-BOOTPROTO=static
-HWADDR=02:00:aa:0a:02:16
-IPADDR=192.168.250.16
-NETMASK=255.255.255.0
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
-
-### eth3
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n1 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth3
-DEVICE=eth3
 BOOTPROTO=none
-HWADDR=02:00:aa:0a:03:11
-MTU=9000
-ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n2 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth3
-DEVICE=eth3
-BOOTPROTO=none
-HWADDR=02:00:aa:0a:03:12
-MTU=9000
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n2 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
+DEVICE=bond1
+NAME=bond1
+IPADDR=192.168.30.102
+NETMASK=255.255.255.0
 ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+BOOTPROTO=none
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n3 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth3
-DEVICE=eth3
-BOOTPROTO=none
-HWADDR=02:00:aa:0a:03:13
-MTU=9000
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n3 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
+DEVICE=bond1
+NAME=bond1
+IPADDR=192.168.30.103
+NETMASK=255.255.255.0
 ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+BOOTPROTO=none
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n4 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth3
-DEVICE=eth3
-BOOTPROTO=none
-HWADDR=02:00:aa:0a:03:14
-MTU=9000
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n4 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
+DEVICE=bond1
+NAME=bond1
+IPADDR=192.168.30.104
+NETMASK=255.255.255.0
 ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+BOOTPROTO=none
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n5 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth3
-DEVICE=eth3
-BOOTPROTO=none
-HWADDR=02:00:aa:0a:03:15
-MTU=9000
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n5 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
+DEVICE=bond1
+NAME=bond1
+IPADDR=192.168.30.105
+NETMASK=255.255.255.0
 ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+BOOTPROTO=none
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'
 
-sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n6 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth3
-DEVICE=eth3
-BOOTPROTO=none
-HWADDR=02:00:aa:0a:03:16
-MTU=9000
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n6 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
+DEVICE=bond1
+NAME=bond1
+IPADDR=192.168.30.106
+NETMASK=255.255.255.0
 ONBOOT=yes
-TYPE=Ethernet
-USERCTL=no
-EOF"
+BOOTPROTO=none
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'
+
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n7 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
+DEVICE=bond1
+NAME=bond1
+IPADDR=192.168.30.107
+NETMASK=255.255.255.0
+ONBOOT=yes
+BOOTPROTO=none
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'
+
+sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n8 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
+DEVICE=bond1
+NAME=bond1
+IPADDR=192.168.30.108
+NETMASK=255.255.255.0
+ONBOOT=yes
+BOOTPROTO=none
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'
+
+### bond2
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond2
+DEVICE=bond2
+NAME=bond2
+ONBOOT=yes
+BOOTPROTO=none
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth3 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'; done
 
 for i in {1..8}; do virsh shutdown n$i; done && sleep 90 && virsh list --all && for i in {1..8}; do virsh start n$i; done && sleep 90 && virsh list --all
+
+sleep 30
+
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install -y keepalived haproxy"; done
+
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee  /etc/keepalived/check_apiserver.sh
+#!/bin/sh
+
+errorExit() {
+  echo "*** $@" 1>&2
+  exit 1
+}
+
+curl --silent --max-time 2 --insecure https://localhost:6443/ -o /dev/null || errorExit "Error GET https://localhost:6443/"
+if ip addr | grep -q 192.168.30.100; then
+  curl --silent --max-time 2 --insecure https://192.168.30.100:6443/ -o /dev/null || errorExit "Error GET https://192.168.30.100:6443/"
+fi
+EOF'; done
+
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo chmod +x /etc/keepalived/check_apiserver.sh"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo swapoff -a"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install -y iproute-tc"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo modprobe overlay"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo modprobe br_netfilter"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo sysctl --system"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8/devel:kubic:libcontainers:stable.repo"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "export VERSION=1.24.2 && sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$VERSION/CentOS_8/devel:kubic:libcontainers:stable:cri-o:$VERSION.repo"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install -y cri-o"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl enable cri-o"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl start cri-o"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "cat << EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kubelet kubeadm kubectl
+EOF"; done
+
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo dnf install -y kubelet kubeadm kubectl --disableexcludes=kubernetes"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl enable kubelet"; done
+for i in {1..6}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl start kubelet"; done
