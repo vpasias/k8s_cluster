@@ -70,6 +70,33 @@ virsh net-define /mnt/extra/ss2.xml && virsh net-autostart ss2 && virsh net-star
 
 ip a && sudo virsh net-list --all
 
+cat > /mnt/extra/pci_device_0.xml <<EOF
+<hostdev mode='subsystem' type='pci' managed='yes'>
+<driver name='vfio' />
+<source>
+<address domain='0x0000' bus='0x6b' slot='0x00' function='0x01' />
+</source>
+</hostdev>
+EOF
+
+cat > /mnt/extra/pci_device_1.xml <<EOF
+<hostdev mode='subsystem' type='pci' managed='yes'>
+<driver name='vfio' />
+<source>
+<address domain='0x0000' bus='0x6c' slot='0x00' function='0x02' />
+</source>
+</hostdev>
+EOF
+
+cat > /mnt/extra/pci_device_2.xml <<EOF
+<hostdev mode='subsystem' type='pci' managed='yes'>
+<driver name='vfio' />
+<source>
+<address domain='0x0000' bus='0x6d' slot='0x00' function='0x03' />
+</source>
+</hostdev>
+EOF
+
 sleep 20
 
 # Node 1
@@ -96,22 +123,30 @@ sleep 20
 # Node 8
 ./kvm-install-vm create -c 4 -m 16384 -t rocky85 -d 120 -u rocky -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c8 n8
 
-sleep 60
+sleep 30
 
 virsh list --all && brctl show && virsh net-list --all
 
+for i in {1..8}; do virsh attach-device n$i /mnt/extra/pci_device_0.xml --config; done
+for i in {1..8}; do virsh attach-device n$i /mnt/extra/pci_device_1.xml --config; done
+for i in {1..8}; do virsh attach-device n$i /mnt/extra/pci_device_2.xml --config; done
+for i in {1..8}; do virsh destroy n$i; done
+for i in {1..8}; do virsh start n$i; done
+
+sleep 30
+
 for i in {1..8}; do qemu-img create -f qcow2 vbdnode1$i.qcow2 120G; done
 for i in {1..8}; do qemu-img create -f qcow2 vbdnode2$i.qcow2 120G; done
-#for i in {1..8}; do qemu-img create -f qcow2 vbdnode3$i.qcow2 120G; done
+for i in {1..8}; do qemu-img create -f qcow2 vbdnode3$i.qcow2 120G; done
 
 for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode1$i.qcow2 -t sdb n$i; done
 for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode2$i.qcow2 -t sdc n$i; done
-#for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
+for i in {1..8}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t sdd n$i; done
 
 for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
 for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --config --live; done
-#for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
-#for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
+for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
+for i in {1..8}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --config --live; done
 
 for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i 'echo "root:gprm8350" | sudo chpasswd'; done
 for i in {1..8}; do ssh -o "StrictHostKeyChecking=no" rocky@n$i 'echo "rocky:kyax7344" | sudo chpasswd'; done
@@ -188,8 +223,8 @@ for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHost
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth0"; done
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth1"; done
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth2"; done
-#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth3"; done
-#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth4"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth3"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo rm -rf /etc/sysconfig/network-scripts/ifcfg-eth4"; done
 
 ### eth0
 sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n1 "cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-eth0
@@ -283,8 +318,8 @@ for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHos
 
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth1 /tmp/ifcfg-eth1"; done
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth2 /tmp/ifcfg-eth2"; done
-#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth3 /tmp/ifcfg-eth3"; done
-#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth4 /tmp/ifcfg-eth4"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth3 /tmp/ifcfg-eth3"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cp /etc/sysconfig/network-scripts/ifcfg-eth4 /tmp/ifcfg-eth4"; done
 
 ### Bond port configuration
 for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth1
@@ -299,17 +334,17 @@ MASTER=bond1
 SLAVE=yes
 EOF"; done
 
-#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth3
-#NAME=bond-slave-eth3
-#MASTER=bond2
-#SLAVE=yes
-#EOF"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth3
+NAME=bond-slave-eth3
+MASTER=bond2
+SLAVE=yes
+EOF"; done
 
-#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth4
-#NAME=bond-slave-eth4
-#MASTER=bond2
-#SLAVE=yes
-#EOF"; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o "StrictHostKeyChecking=no" root@n$i "cat << EOF | sudo tee -a /etc/sysconfig/network-scripts/ifcfg-eth4
+NAME=bond-slave-eth4
+MASTER=bond2
+SLAVE=yes
+EOF"; done
 
 ### bond1
 sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n1 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond1
@@ -409,15 +444,15 @@ BONDING_OPTS="mode=active-backup primary=eth1 miimon=100 primary_reselect=always
 EOF'
 
 ### bond2
-#for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond2
-#DEVICE=bond2
-#NAME=bond2
-#ONBOOT=yes
-#BOOTPROTO=none
-#TYPE=Bond
-#BONDING_MASTER=yes
-#BONDING_OPTS="mode=active-backup primary=eth3 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
-#EOF'; done
+for i in {1..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/sysconfig/network-scripts/ifcfg-bond2
+DEVICE=bond2
+NAME=bond2
+ONBOOT=yes
+BOOTPROTO=none
+TYPE=Bond
+BONDING_MASTER=yes
+BONDING_OPTS="mode=active-backup primary=eth3 miimon=100 primary_reselect=always fail_over_mac=follow use_carrier=0"
+EOF'; done
 
 for i in {1..8}; do virsh shutdown n$i; done && sleep 90 && virsh list --all && for i in {1..8}; do virsh start n$i; done && sleep 90 && virsh list --all
 
