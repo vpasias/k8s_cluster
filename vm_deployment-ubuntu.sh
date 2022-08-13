@@ -472,7 +472,7 @@ vrrp_script check_apiserver {
 }
 vrrp_instance VI_1 {
     state BACKUP
-    interface eth1
+    interface bond1
     virtual_router_id 1
     priority 100
     advert_int 5
