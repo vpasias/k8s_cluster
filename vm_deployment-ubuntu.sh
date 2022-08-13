@@ -145,14 +145,14 @@ for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | s
 options kvm_intel nested=1
 EOF"; done
 
-#for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo DEBIAN_FRONTEND=noninteractive apt-get install linux-generic-hwe-20.04 --install-recommends -y"; done
-#for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt autoremove -y && sudo apt --fix-broken install -y"; done
+for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo DEBIAN_FRONTEND=noninteractive apt-get install linux-generic-hwe-20.04 --install-recommends -y"; done
+for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt autoremove -y && sudo apt --fix-broken install -y"; done
 
-#for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo mkdir -p /etc/systemd/system/networking.service.d"; done
-#for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/systemd/system/networking.service.d/reduce-timeout.conf
-#[Service]
-#TimeoutStartSec=15
-#EOF"; done
+for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo mkdir -p /etc/systemd/system/networking.service.d"; done
+for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/systemd/system/networking.service.d/reduce-timeout.conf
+[Service]
+TimeoutStartSec=15
+EOF"; done
 
 for i in {1..9}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..9}; do virsh start n$i; done && sleep 10 && virsh list --all
 
