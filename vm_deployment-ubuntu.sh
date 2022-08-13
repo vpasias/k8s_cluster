@@ -64,7 +64,7 @@ EOF
 
 cat > /mnt/extra/pci_device_1.xml <<EOF
 <hostdev mode='subsystem' type='pci' managed='yes'>
-<driver name='vhost' />
+<driver name='vfio' />
 <source>
 <address domain='0x0000' bus='0x6b' slot='0x00' function='0x01' />
 </source>
