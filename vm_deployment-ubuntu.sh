@@ -123,7 +123,7 @@ for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo hostnamec
 
 for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt update -y && sudo apt-get install -y git vim net-tools wget curl bash-completion apt-utils iperf iperf3 mtr traceroute netcat sshpass socat python3 python3-simplejson xfsprogs locate jq ifenslave"; done
 
-for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt-get install ntp ntpdate -y && sudo timedatectl set-ntp on"; done
+#for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt-get install ntp ntpdate -y && sudo timedatectl set-ntp on"; done
 
 for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo modprobe bonding"; done
 for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "lsmod | grep bond"; done
