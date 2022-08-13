@@ -173,9 +173,9 @@ for i in {1..9}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-instal
 #for i in {1..9}; do ./kvm-install-vm attach-disk -d 120 -s /mnt/extra/kvm-install-vm/vbdnode3$i.qcow2 -t vdd n$i; done
 
 for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ds1 --model virtio --mac 02:00:aa:0a:01:1$i --config --live; done
-for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ds2 --model virtio --mac 02:00:aa:0a:02:1$i --config --live; done
-#for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ss1 --model virtio --mac 02:00:aa:0a:03:1$i --config --live; done
-#for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ss2 --model virtio --mac 02:00:aa:0a:04:1$i --config --live; done
+for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ds2 --model e1000e --mac 02:00:aa:0a:02:1$i --config --live; done
+#for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ss1 --model e1000e --mac 02:00:aa:0a:03:1$i --config --live; done
+#for i in {1..9}; do virsh attach-interface --domain n$i --type network --source ss2 --model e1000e --mac 02:00:aa:0a:04:1$i --config --live; done
 
 for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "cat << EOF | sudo tee /etc/hosts
 127.0.0.1 localhost
