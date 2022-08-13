@@ -62,6 +62,15 @@ cat > /mnt/extra/ss2.xml <<EOF
 </network>
 EOF
 
+cat > /mnt/extra/pci_device_1.xml <<EOF
+<hostdev mode='subsystem' type='pci' managed='yes'>
+<driver name='vhost' />
+<source>
+<address domain='0x0000' bus='0x6b' slot='0x00' function='0x01' />
+</source>
+</hostdev>
+EOF
+
 virsh net-define /mnt/extra/mgmt.xml && virsh net-autostart mgmt && virsh net-start mgmt
 virsh net-define /mnt/extra/ds1.xml && virsh net-autostart ds1 && virsh net-start ds1
 virsh net-define /mnt/extra/ds2.xml && virsh net-autostart ds2 && virsh net-start ds2
@@ -148,6 +157,11 @@ EOF"; done
 for i in {1..9}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && for i in {1..9}; do virsh start n$i; done && sleep 10 && virsh list --all
 
 sleep 30
+
+for i in {1..9}; do virsh attach-device n$i /mnt/extra/pci_device_1.xml --config; done
+
+for i in {1..9}; do virsh destroy n$i; done && sleep 10
+for i in {1..9}; do virsh start n$i; done && sleep 10
 
 for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt update -y"; done
 
