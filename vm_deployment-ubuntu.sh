@@ -158,10 +158,9 @@ for i in {1..9}; do virsh shutdown n$i; done && sleep 10 && virsh list --all && 
 
 sleep 30
 
-for i in {1..9}; do virsh attach-device n$i /mnt/extra/pci_device_1.xml --config; done
-
-for i in {1..9}; do virsh destroy n$i; done && sleep 10
-for i in {1..9}; do virsh start n$i; done && sleep 10
+#for i in {1..9}; do virsh attach-device n$i /mnt/extra/pci_device_1.xml --config; done
+#for i in {1..9}; do virsh destroy n$i; done && sleep 10
+#for i in {1..9}; do virsh start n$i; done && sleep 10
 
 for i in {1..9}; do ssh -o "StrictHostKeyChecking=no" ubuntu@n$i "sudo apt update -y"; done
 
