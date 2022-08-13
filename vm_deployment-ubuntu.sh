@@ -82,7 +82,7 @@ ip a && sudo virsh net-list --all
 sleep 20
 
 # Node 1
-./kvm-install-vm create -c 4 -m 16384 -t ubuntu2004 -d 120 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -b ds1 -T US/Eastern -M 52:54:00:8a:8b:c1 n1
+./kvm-install-vm create -c 4 -m 16384 -t ubuntu2004 -d 120 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c1 n1
 
 # Node 2
 ./kvm-install-vm create -c 4 -m 16384 -t ubuntu2004 -d 120 -f host-passthrough -k /root/.ssh/id_rsa.pub -l /mnt/extra/virt/images -L /mnt/extra/virt/vms -b mgmt -T US/Eastern -M 52:54:00:8a:8b:c2 n2
