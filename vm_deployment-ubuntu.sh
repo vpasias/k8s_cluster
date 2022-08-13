@@ -491,7 +491,7 @@ EOF'; done
 
 for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl enable --now keepalived && sudo systemctl start keepalived"; done
 
-for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee/etc/haproxy/haproxy.cfg
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/haproxy/haproxy.cfg
 frontend kubernetes-frontend
   bind *:6443
   mode tcp
