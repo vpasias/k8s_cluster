@@ -91,8 +91,8 @@ for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo sysctl -
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8_Stream/devel:kubic:libcontainers:stable.repo"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:1.24.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:1.24/CentOS_8_Stream/devel:kubic:libcontainers:stable:cri-o:1.24.repo"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install -y cri-o"; done
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl daemon-reload && sudo systemctl enable cri-o"; done
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl start cri-o"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl daemon-reload && sudo systemctl enable crio"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl start crio"; done
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "cat << EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
