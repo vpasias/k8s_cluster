@@ -462,7 +462,7 @@ vrrp_script check_apiserver {
 
 vrrp_instance VI_1 {
     state BACKUP
-    interface eth1
+    interface bond1
     virtual_router_id 1
     priority 100
     advert_int 5
@@ -481,7 +481,7 @@ EOF'; done
 
 for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i "sudo systemctl enable --now keepalived"; done
 
-for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee/etc/haproxy/haproxy.cfg
+for i in {7..8}; do sshpass -f /mnt/extra/kvm-install-vm/rocky ssh -o StrictHostKeyChecking=no root@n$i 'cat << EOF | sudo tee /etc/haproxy/haproxy.cfg
 
 frontend kubernetes-frontend
   bind *:6443
