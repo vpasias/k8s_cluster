@@ -111,3 +111,26 @@ EOF"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install -y kubelet kubeadm kubectl --disableexcludes=kubernetes"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl enable kubelet"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl start kubelet"; done
+
+sleep 20
+
+ssh -o StrictHostKeyChecking=no rocky@node-1 "sudo crictl info && sudo systemctl status kubelet"
+
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubeadm init --control-plane-endpoint="192.168.30.100:6443" --upload-certs --apiserver-advertise-address=192.168.30.201 --pod-network-cidr=172.16.0.0/16 --token ayngk7.m1555duk5x2i3ctt --token-ttl 0 | tee /home/rocky/kubeadm.log'
+
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.23/manifests/calico.yaml"
+
+sudo apt install snapd -y
+sudo snap install kubectl --classic
+
+mkdir ~/.kube
+sshpass -f /home/iason/k8s_cluster/rocky scp root@node-1:/etc/kubernetes/admin.conf ~/.kube/config
+sshpass -f /home/iason/k8s_cluster/rocky scp root@node-1:/home/rocky/kubeadm.log ~/.kube/kubeadm.log
+for i in {2..6}; do scp ~/.kube/kubeadm.log rocky@node-$i:/home/rocky/kubeadm.log; done
+
+discovery_token_ca_cert_hash="$(grep 'discovery-token-ca-cert-hash' ~/.kube/kubeadm.log | head -n1 | awk '{print $2}')"
+certificate_key="$(grep 'certificate-key' ~/.kube/kubeadm.log | head -n1 | awk '{print $3}')"
+
+for i in {2..3}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "kubeadm join 192.168.30.100:6443 --token ayngk7.m1555duk5x2i3ctt --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash} --control-plane --certificate-key ${certificate_key} --apiserver-advertise-address=192.168.30.20$i"; done
+
+for i in {4..6}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "kubeadm join 192.168.30.100:6443 --token ayngk7.m1555duk5x2i3ctt --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash}"; done
