@@ -3,12 +3,12 @@
 
 git clone --single-branch --branch release-1.9 https://github.com/rook/rook.git
 cd /home/iason/k8s_cluster/rook/deploy/examples/ 
-kubectl create -f crds.yaml
+sudo kubectl create -f crds.yaml
 sleep 5
-kubectl create -f common.yaml
-kubectl create -f operator.yaml
-kubectl get all -n rook-ceph
+sudo kubectl create -f common.yaml
+sudo kubectl create -f operator.yaml
+sudo kubectl get all -n rook-ceph
 sleep 120
-kubectl -n rook-ceph get pod
-kubectl config set-context --current --namespace rook-ceph
-kubectl create -f /home/iason/k8s_cluster/cluster.yaml
+sudo kubectl -n rook-ceph get pod
+sudo kubectl config set-context --current --namespace rook-ceph
+sudo kubectl create -f /home/iason/k8s_cluster/cluster.yaml
