@@ -11,6 +11,6 @@ sudo kubectl apply -f /home/iason/k8s_cluster/kube-prometheus/manifests/
 
 sleep 20
 
-sudo kubectl get pods -n monitoring
-
 sudo kubectl get svc -n monitoring
+
+sudo kubectl get pods -n monitoring
