@@ -9,6 +9,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 # Update helm repo
 helm repo update
 
+# Install helm charts
 helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
 
 #git clone https://github.com/prometheus-operator/kube-prometheus.git
