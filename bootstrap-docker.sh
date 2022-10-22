@@ -92,9 +92,34 @@ EOF"; done
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo sysctl --system"; done
 
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo bash -c "echo 'nameserver 10.96.0.10' > /etc/resolv.conf""; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo bash -c "printf 'nameserver 8.8.8.8\nnameserver 8.8.4.4\n' > /run/systemd/resolve/resolv.conf""; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo bash -c "printf 'nameserver 8.8.8.8\nnameserver 8.8.4.4\n' >> /etc/resolv.conf""; done
+
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "for file in /etc/resolv.conf /run/systemd/resolve/resolv.conf; do
+    sudo bash -c "echo 'search svc.cluster.local cluster.local' >> ${file}"
+    sudo bash -c "echo 'options ndots:5 timeout:1 attempts:1' >> ${file}"
+done"; done
+
 # Install Docker
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install docker-ce -y"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install socat jq util-linux bridge-utils libffi-devel ipvsadm make bc git-review notary"; done
+
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo -E mkdir -p /etc/docker"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo -E tee /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "live-restore": true,
+  "dns": 10.96.0.1, 8.8.8.8, 8.8.4.4
+}
+EOF'; done
+
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl start docker"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl enable docker"; done
 
