@@ -69,6 +69,8 @@ for i in {7..8}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemct
 
 ### Kubernetes nodes configuration
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo swapoff -a"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'echo "DefaultLimitMEMLOCK=16384" | sudo tee -a /etc/systemd/system.conf'; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl daemon-reexec"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install -y iproute-tc"; done
 
@@ -90,12 +92,11 @@ EOF"; done
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo sysctl --system"; done
 
-# cri-o version=1.24
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable.repo https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_8/devel:kubic:libcontainers:stable.repo"; done
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo curl -L -o /etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:1.24.repo https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:1.24/CentOS_8/devel:kubic:libcontainers:stable:cri-o:1.24.repo"; done
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install -y cri-o"; done
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl daemon-reload && sudo systemctl enable crio"; done
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl start crio"; done
+# Install Docker
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install docker-ce -y"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl start docker"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl enable docker"; done
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "cat << EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
@@ -114,11 +115,55 @@ for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemct
 
 sleep 30
 
-ssh -o StrictHostKeyChecking=no rocky@node-1 "sudo crictl info && sudo systemctl status kubelet"
+ssh -o StrictHostKeyChecking=no rocky@node-1 "sudo systemctl status kubelet"
 
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubeadm init --control-plane-endpoint="192.168.30.100:6443" --upload-certs --apiserver-advertise-address=192.168.30.201 --pod-network-cidr=172.16.0.0/16 --token ayngk7.m1555duk5x2i3ctt --token-ttl 0 | tee /home/rocky/kubeadm.log'
+# Kubernetes Version: v1.23.4
+ssh -o StrictHostKeyChecking=no rocky@node-1 "cat << EOF | sudo tee kubeadm-config.yaml
+kind: ClusterConfiguration
+apiVersion: kubeadm.k8s.io/v1beta3
+kubernetesVersion: v1.25.3
+--
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+cgroupDriver: cgroupfs
+EOF"
 
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.23/manifests/calico.yaml"
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubeadm init --config kubeadm-config.yaml --control-plane-endpoint="192.168.30.100:6443" --upload-certs --apiserver-advertise-address=192.168.30.201 --pod-network-cidr=172.16.0.0/16 --token ayngk7.m1555duk5x2i3ctt --token-ttl 0 | tee /home/rocky/kubeadm.log'
+
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "wget https://github.com/mikefarah/yq/releases/download/4.6.0/yq_linux_amd64.tar.gz -O - | tar xz && sudo mv yq_linux_amd64 /usr/local/bin/yq"; done
+
+# Calico version: v3.24
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "curl https://docs.projectcalico.org/v3.24/manifests/calico.yaml -o /tmp/calico.yaml"
+
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "sed -i -e 's#docker.io/calico/#quay.io/calico/#g' /tmp/calico.yaml"
+
+# Download images needed for calico before applying manifests, so that `kubectl wait` timeout for `k8s-app=kube-dns` isn't reached by slow download speeds
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "awk '/image:/ { print $2 }' /tmp/calico.yaml | xargs -I{} sudo docker pull {}"
+
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /tmp/calico.yaml"
+
+# Note: Patch calico daemonset to enable Prometheus metrics and annotations
+ssh -o StrictHostKeyChecking=no rocky@node-1 "cat << EOF | sudo tee /tmp/calico-node.yaml << EOF
+spec:
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9091"
+    spec:
+      containers:
+        - name: calico-node
+          env:
+            - name: FELIX_PROMETHEUSMETRICSENABLED
+              value: "true"
+            - name: FELIX_PROMETHEUSMETRICSPORT
+              value: "9091"
+            - name: FELIX_IGNORELOOSERPF
+              value: "true"
+EOF"
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubectl -n kube-system patch daemonset calico-node --patch "$(cat /tmp/calico-node.yaml)"'
+
+sleep 240
 
 sudo apt install snapd -y
 sudo snap install kubectl --classic
@@ -136,3 +181,6 @@ for i in {2..3}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKe
 sleep 10
 
 for i in {4..6}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "kubeadm join 192.168.30.100:6443 --token ayngk7.m1555duk5x2i3ctt --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash}"; done
+
+# Taint the nodes so that the pods can be deployed on master nodes.
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "kubectl taint nodes --all node-role.kubernetes.io/master-"; done
