@@ -169,7 +169,7 @@ sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@no
 sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /tmp/calico.yaml"
 
 # Note: Patch calico daemonset to enable Prometheus metrics and annotations
-ssh -o StrictHostKeyChecking=no rocky@node-1 'cat << EOF | sudo tee /tmp/calico-node.yaml << EOF
+ssh -o StrictHostKeyChecking=no rocky@node-1 'cat << EOF | sudo tee /tmp/calico-node.yaml
 spec:
   template:
     metadata:
