@@ -116,8 +116,7 @@ for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo -E tee /
     "max-size": "100m"
   },
   "storage-driver": "overlay2",
-  "live-restore": true,
-  "dns": 10.96.0.1, 8.8.8.8, 8.8.4.4
+  "live-restore": true
 }
 EOF'; done
 
