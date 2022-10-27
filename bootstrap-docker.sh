@@ -99,10 +99,11 @@ for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo bash -c 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo bash -c "printf 'nameserver 8.8.8.8\nnameserver 8.8.4.4\n' > /run/systemd/resolve/resolv.conf"'; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo bash -c "printf 'nameserver 8.8.8.8\nnameserver 8.8.4.4\n' >> /etc/resolv.conf"'; done
 
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'for file in /etc/resolv.conf /run/systemd/resolve/resolv.conf; do
-    sudo bash -c "echo 'search svc.cluster.local cluster.local' >> ${file}"
-    sudo bash -c "echo 'options ndots:5 timeout:1 attempts:1' >> ${file}"
-done'; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo bash -c "echo 'search svc.cluster.local cluster.local' > /etc/resolv.conf"'; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo bash -c "echo 'options ndots:5 timeout:1 attempts:1' > /etc/resolv.conf"'; done
+
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo bash -c "echo 'search svc.cluster.local cluster.local' > /run/systemd/resolve/resolv.conf"'; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo bash -c "echo 'options ndots:5 timeout:1 attempts:1' > /run/systemd/resolve/resolv.conf"'; done
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo chmod 400 /etc/resolv.conf"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo chmod 400 /run/systemd/resolve/resolv.conf"; done
