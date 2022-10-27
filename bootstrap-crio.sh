@@ -118,7 +118,7 @@ ssh -o StrictHostKeyChecking=no rocky@node-1 "sudo crictl info && sudo systemctl
 
 sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubeadm init --control-plane-endpoint="192.168.30.100:6443" --upload-certs --apiserver-advertise-address=192.168.30.201 --pod-network-cidr=172.16.0.0/16 --token ayngk7.m1555duk5x2i3ctt --token-ttl 0 | tee /home/rocky/kubeadm.log'
 
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.23/manifests/calico.yaml"
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/manifests/calico.yaml"
 
 sudo apt install snapd -y
 sudo snap install kubectl --classic
