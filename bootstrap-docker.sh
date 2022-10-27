@@ -148,7 +148,7 @@ apiVersion: kubeadm.k8s.io/v1beta3
 kind: InitConfiguration
 bootstrapTokens:
 - token: "ayngk7.m1555duk5x2i3ctt"
-  description: "default kubeadm bootstrap token
+  description: "default kubeadm bootstrap token"
   ttl: "0"
 --
 kind: ClusterConfiguration
