@@ -174,28 +174,8 @@ sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@no
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "wget https://github.com/mikefarah/yq/releases/download/v4.6.0/yq_linux_amd64.tar.gz -O - | tar xz && sudo mv yq_linux_amd64 /usr/local/bin/yq"; done
 
 # Install Calico
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/manifests/calico.yaml"
-
-# Note: Patch calico daemonset to enable Prometheus metrics and annotations
-ssh -o StrictHostKeyChecking=no rocky@node-1 'cat << EOF | sudo tee /tmp/calico-node.yaml
-spec:
-  template:
-    metadata:
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9091"
-    spec:
-      containers:
-        - name: calico-node
-          env:
-            - name: FELIX_PROMETHEUSMETRICSENABLED
-              value: "true"
-            - name: FELIX_PROMETHEUSMETRICSPORT
-              value: "9091"
-            - name: FELIX_IGNORELOOSERPF
-              value: "true"
-EOF'
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubectl -n kube-system patch daemonset calico-node --patch "$(cat /tmp/calico-node.yaml)"'
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml"
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml"
 
 sleep 240
 
