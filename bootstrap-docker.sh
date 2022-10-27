@@ -174,14 +174,7 @@ sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@no
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "wget https://github.com/mikefarah/yq/releases/download/v4.6.0/yq_linux_amd64.tar.gz -O - | tar xz && sudo mv yq_linux_amd64 /usr/local/bin/yq"; done
 
 # Calico version: v3.24
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "curl https://docs.projectcalico.org/v3.24/manifests/calico.yaml -o /tmp/calico.yaml"
-
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "sed -i -e 's#docker.io/calico/#quay.io/calico/#g' /tmp/calico.yaml"
-
-# Download images needed for calico before applying manifests, so that `kubectl wait` timeout for `k8s-app=kube-dns` isn't reached by slow download speeds
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "awk '/image:/ { print $2 }' /tmp/calico.yaml | xargs -I{} sudo docker pull {}"
-
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /tmp/calico.yaml"
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.24/manifests/calico.yaml"
 
 # Note: Patch calico daemonset to enable Prometheus metrics and annotations
 ssh -o StrictHostKeyChecking=no rocky@node-1 'cat << EOF | sudo tee /tmp/calico-node.yaml
