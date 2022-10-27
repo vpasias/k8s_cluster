@@ -102,16 +102,6 @@ search svc.cluster.local cluster.local
 options ndots:5 timeout:1 attempts:1
 EOF"; done
 
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo rm -rf /run/systemd/resolve/resolv.conf"; done
-
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "cat << EOF | sudo tee /run/systemd/resolve/resolv.conf
-nameserver 10.96.0.10
-nameserver 8.8.8.8
-nameserver 8.8.4.4
-search svc.cluster.local cluster.local
-options ndots:5 timeout:1 attempts:1
-EOF"; done
-
 # Install Docker
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install docker-ce -y"; done
