@@ -175,7 +175,7 @@ for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "wget https://
 
 # Install Calico
 sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml"
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml"
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/manifests/custom-resources.yaml"
 
 sleep 240
 
