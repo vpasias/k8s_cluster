@@ -158,7 +158,7 @@ token: ayngk7.m1555duk5x2i3ctt
 token-ttl: 0
 EOF"
 
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubeadm init --config kubeadm-config.yaml --control-plane-endpoint="192.168.30.100:6443" --upload-certs --apiserver-advertise-address=192.168.30.201 --pod-network-cidr=172.16.0.0/16 --token ayngk7.m1555duk5x2i3ctt --token-ttl 0 | tee /home/rocky/kubeadm.log'
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubeadm init --config kubeadm-config.yaml --upload-certs | tee /home/rocky/kubeadm.log'
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "wget https://github.com/mikefarah/yq/releases/download/v4.6.0/yq_linux_amd64.tar.gz -O - | tar xz && sudo mv yq_linux_amd64 /usr/local/bin/yq"; done
 
