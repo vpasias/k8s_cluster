@@ -195,6 +195,3 @@ for i in {2..3}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKe
 sleep 10
 
 for i in {4..6}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "kubeadm join 192.168.30.100:6443 --token ayngk7.m1555duk5x2i3ctt --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash}"; done
-
-# Taint the nodes so that the pods can be deployed on master nodes.
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "kubectl taint nodes --all node-role.kubernetes.io/master-"; done
