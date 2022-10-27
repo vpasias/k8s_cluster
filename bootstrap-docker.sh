@@ -143,20 +143,28 @@ sleep 30
 ssh -o StrictHostKeyChecking=no rocky@node-1 "sudo systemctl status kubelet"
 
 # Kubernetes Version: v1.25.3
-ssh -o StrictHostKeyChecking=no rocky@node-1 "cat << EOF | sudo tee kubeadm-config.yaml
+ssh -o StrictHostKeyChecking=no rocky@node-1 'cat << EOF | sudo tee kubeadm-config.yaml
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+bootstrapTokens:
+- token: "ayngk7.m1555duk5x2i3ctt"
+  description: "default kubeadm bootstrap token
+  ttl: "0"
+--
 kind: ClusterConfiguration
 apiVersion: kubeadm.k8s.io/v1beta3
 kubernetesVersion: v1.25.3
+controlPlaneEndpoint: 192.168.30.100:6443
+apiServer:
+  advertise:
+    address: 192.168.30.201
+networking:
+  podSubnet: 172.16.0.0/16
 --
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 cgroupDriver: cgroupfs
-controlPlaneEndpoint: 192.168.30.100:6443
-apiserver-advertise-address: 192.168.30.201
-pod-network-cidr: 172.16.0.0/16
-token: ayngk7.m1555duk5x2i3ctt
-token-ttl: 0
-EOF"
+EOF'
 
 sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubeadm init --config /home/rocky/kubeadm-config.yaml --upload-certs | tee /home/rocky/kubeadm.log'
 
