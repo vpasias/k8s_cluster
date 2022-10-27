@@ -142,7 +142,7 @@ sleep 30
 
 ssh -o StrictHostKeyChecking=no rocky@node-1 "sudo systemctl status kubelet"
 
-# Kubernetes Version: v1.23.4
+# Kubernetes Version: v1.25.3
 ssh -o StrictHostKeyChecking=no rocky@node-1 "cat << EOF | sudo tee kubeadm-config.yaml
 kind: ClusterConfiguration
 apiVersion: kubeadm.k8s.io/v1beta3
