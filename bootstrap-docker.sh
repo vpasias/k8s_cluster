@@ -173,8 +173,8 @@ sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@no
  
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "wget https://github.com/mikefarah/yq/releases/download/v4.6.0/yq_linux_amd64.tar.gz -O - | tar xz && sudo mv yq_linux_amd64 /usr/local/bin/yq"; done
 
-# Calico version: v3.24
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.24/manifests/calico.yaml"
+# Install Calico
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/manifests/calico.yaml"
 
 # Note: Patch calico daemonset to enable Prometheus metrics and annotations
 ssh -o StrictHostKeyChecking=no rocky@node-1 'cat << EOF | sudo tee /tmp/calico-node.yaml
