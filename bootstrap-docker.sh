@@ -105,7 +105,7 @@ EOF"; done
 # Install Docker
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install docker-ce -y"; done
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install socat jq util-linux bridge-utils libffi-devel ipvsadm make bc git-review"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install socat jq util-linux bridge-utils libffi-devel ipvsadm make bc git-review -y"; done
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo -E mkdir -p /etc/docker"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i 'sudo -E tee /etc/docker/daemon.json <<EOF
