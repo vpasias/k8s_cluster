@@ -122,7 +122,7 @@ for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf inst
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl enable kubelet"; done
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl start kubelet"; done
 
-sleep 30
+sleep 120
 
 ssh -o StrictHostKeyChecking=no rocky@node-1 "sudo systemctl status kubelet"
 
