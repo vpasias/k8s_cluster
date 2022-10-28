@@ -90,12 +90,14 @@ EOF"; done
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo sysctl --system"; done
 
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo yum install -y yum-utils device-mapper-persistent-data lvm2"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install -y yum-utils device-mapper-persistent-data lvm2"; done
 
 # containerd installation
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo "; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo"; done
 
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo yum update -y && yum install -y containerd.io"; done
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf update -y"; done
+
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install -y containerd.io"; done
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo mkdir -p /etc/containerd && sudo containerd config default > /etc/containerd/config.toml"; done
 
