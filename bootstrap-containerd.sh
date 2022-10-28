@@ -99,7 +99,7 @@ for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf upda
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo dnf install -y containerd.io"; done
 
-for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo mkdir -p /etc/containerd && sudo containerd config default > /etc/containerd/config.toml"; done
+for i in {1..6}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "mkdir -p /etc/containerd && containerd config default > /etc/containerd/config.toml"; done
 
 for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl restart containerd"; done
 
