@@ -183,3 +183,13 @@ for h in node-2 node-3 node-4 node-5 node-6; do ssh -o StrictHostKeyChecking=no 
 sudo kubectl cluster-info
 sudo kubectl get nodes -o wide --all-namespaces
 sudo kubectl get pods -o wide --all-namespaces
+
+ssh -o StrictHostKeyChecking=no rocky@node-1 "cat > /opt/openstack-helm-infra/tools/gate/devel/multinode-vars.yaml <<EOF
+kubernetes_network_default_device: eth0
+EOF"
+
+ssh -o StrictHostKeyChecking=no rocky@node-1 "curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh && helm version && helm repo remove stable || true"
+ssh -o StrictHostKeyChecking=no rocky@node-1 "mkdir -p /home/rocky/.kube && sudo cp -i /etc/kubernetes/admin.conf /home/rocky/.kube/config && sudo chown $(id -u):$(id -g) /home/rocky/.kube/config"
+ssh -o StrictHostKeyChecking=no rocky@node-1 "kubectl taint nodes --all node-role.kubernetes.io/master-"
+ssh -o StrictHostKeyChecking=no rocky@node-1 "kubectl taint nodes --all node-role.kubernetes.io/control-plane-"
+ssh -o StrictHostKeyChecking=no rocky@node-1 "kubectl cluster-info && kubectl get nodes -o wide --all-namespaces && kubectl get pods -o wide --all-namespaces"
