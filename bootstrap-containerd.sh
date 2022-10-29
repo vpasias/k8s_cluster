@@ -128,7 +128,7 @@ ssh -o StrictHostKeyChecking=no rocky@node-1 "sudo systemctl status kubelet"
 
 sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubeadm config images pull"
 
-sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubeadm init --control-plane-endpoint="192.168.30.100:6443" --upload-certs --apiserver-advertise-address=192.168.30.201 --pod-network-cidr=172.16.0.0/16 --token ayngk7.m1555duk5x2i3ctt --token-ttl 0 | tee /home/rocky/kubeadm.log'
+sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 'kubeadm init --control-plane-endpoint="192.168.20.100:6443" --upload-certs --apiserver-advertise-address=192.168.20.201 --pod-network-cidr=172.16.0.0/16 --token ayngk7.m1555duk5x2i3ctt --token-ttl 0 | tee /home/rocky/kubeadm.log'
 
 sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-1 "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/manifests/calico.yaml"
 
@@ -143,11 +143,11 @@ for i in {2..6}; do scp ~/.kube/kubeadm.log rocky@node-$i:/home/rocky/kubeadm.lo
 discovery_token_ca_cert_hash="$(grep 'discovery-token-ca-cert-hash' ~/.kube/kubeadm.log | head -n1 | awk '{print $2}')"
 certificate_key="$(grep 'certificate-key' ~/.kube/kubeadm.log | head -n1 | awk '{print $3}')"
 
-for i in {2..3}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "kubeadm join 192.168.30.100:6443 --token ayngk7.m1555duk5x2i3ctt --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash} --control-plane --certificate-key ${certificate_key} --apiserver-advertise-address=192.168.30.20$i"; done
+for i in {2..3}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "kubeadm join 192.168.20.100:6443 --token ayngk7.m1555duk5x2i3ctt --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash} --control-plane --certificate-key ${certificate_key} --apiserver-advertise-address=192.168.20.20$i"; done
 
 sleep 10
 
-for i in {4..6}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "kubeadm join 192.168.30.100:6443 --token ayngk7.m1555duk5x2i3ctt --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash}"; done
+for i in {4..6}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "kubeadm join 192.168.20.100:6443 --token ayngk7.m1555duk5x2i3ctt --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash}"; done
 
 sleep 20
 
