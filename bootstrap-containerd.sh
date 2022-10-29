@@ -148,3 +148,38 @@ for i in {2..3}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKe
 sleep 10
 
 for i in {4..6}; do sshpass -f /home/iason/k8s_cluster/rocky ssh -o StrictHostKeyChecking=no root@node-$i "kubeadm join 192.168.30.100:6443 --token ayngk7.m1555duk5x2i3ctt --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash}"; done
+
+sleep 20
+
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh
+helm version
+helm repo remove stable || true
+
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl start docker && sudo systemctl enable docker && sudo systemctl status docker"; done
+sleep 10
+for i in {1..6}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo usermod -aG docker rocky"; done
+
+sudo kubectl create namespace openstack
+sudo kubectl create namespace ceph
+sudo kubectl label --overwrite namespace default name=default
+sudo kubectl label --overwrite namespace kube-system name=kube-system
+sudo kubectl label --overwrite namespace kube-public name=kube-public
+sudo kubectl label nodes --all openstack-control-plane=enabled
+sudo kubectl label nodes --all openstack-compute-node=enabled
+sudo kubectl label nodes --all openvswitch=enabled
+sudo kubectl label nodes --all linuxbridge=enabled
+sudo kubectl label nodes --all ceph-mon=enabled
+sudo kubectl label nodes --all ceph-osd=enabled
+sudo kubectl label nodes --all ceph-mds=enabled
+sudo kubectl label nodes --all ceph-rgw=enabled
+sudo kubectl label nodes --all ceph-mgr=enabled
+
+sleep 10
+
+ssh -o StrictHostKeyChecking=no rocky@node-1 'ssh-keygen -t rsa -N "" -f .ssh/id_rsa && for h in node-1 node-2 node-3 node-4 node-5 node-6 node-7 node-8 node-9; do sshpass -p gprm8350 ssh-copy-id -o "StrictHostKeyChecking=no" rocky@$h;done'
+ssh -o StrictHostKeyChecking=no rocky@node-1 "sudo chown -R rocky: /opt && git clone https://opendev.org/openstack/openstack-helm-infra.git /opt/openstack-helm-infra && git clone https://opendev.org/openstack/openstack-helm.git /opt/openstack-helm"
+for h in node-2 node-3 node-4 node-5 node-6; do ssh -o StrictHostKeyChecking=no rocky@$h "sudo chown -R rocky: /opt && git clone https://opendev.org/openstack/openstack-helm-infra.git /opt/openstack-helm-infra && git clone https://opendev.org/openstack/openstack-helm.git /opt/openstack-helm";done
+
+sudo kubectl cluster-info
+sudo kubectl get nodes -o wide --all-namespaces
+sudo kubectl get pods -o wide --all-namespaces
