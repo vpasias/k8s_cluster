@@ -11,8 +11,8 @@ errorExit() {
   exit 1
 }
 curl --silent --max-time 2 --insecure https://localhost:6443/ -o /dev/null || errorExit "Error GET https://localhost:6443/"
-if ip addr | grep -q 192.168.30.100; then
-  curl --silent --max-time 2 --insecure https://192.168.30.100:6443/ -o /dev/null || errorExit "Error GET https://192.168.30.100:6443/"
+if ip addr | grep -q 192.168.20.100; then
+  curl --silent --max-time 2 --insecure https://192.168.20.100:6443/ -o /dev/null || errorExit "Error GET https://192.168.20.100:6443/"
 fi
 EOF'; done
 
@@ -29,7 +29,7 @@ vrrp_script check_apiserver {
 }
 vrrp_instance VI_1 {
     state BACKUP
-    interface bond1
+    interface eth0
     virtual_router_id 1
     priority 100
     advert_int 5
@@ -38,7 +38,7 @@ vrrp_instance VI_1 {
         auth_pass mysecret
     }
     virtual_ipaddress {
-        192.168.30.100
+        192.168.20.100
     }
     track_script {
         check_apiserver
@@ -60,9 +60,9 @@ backend kubernetes-backend
   mode tcp
   option ssl-hello-chk
   balance roundrobin
-    server n1 192.168.30.201:6443 check fall 3 rise 2
-    server n2 192.168.30.202:6443 check fall 3 rise 2
-    server n3 192.168.30.203:6443 check fall 3 rise 2
+    server n1 192.168.20.201:6443 check fall 3 rise 2
+    server n2 192.168.20.202:6443 check fall 3 rise 2
+    server n3 192.168.20.203:6443 check fall 3 rise 2
 EOF'; done
 
 for i in {7..8}; do ssh -o StrictHostKeyChecking=no rocky@node-$i "sudo systemctl enable haproxy && sudo systemctl restart haproxy"; done
